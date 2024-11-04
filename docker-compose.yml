@@ -1,0 +1,37 @@
+version: '2'
+services:
+    php-apache-dev:
+        image: 'webdevops/php-apache-dev:8.3-alpine'
+        links:
+            - 'mysql:mysql'
+        volumes:
+            - './:/app'
+        ports:
+            - '80:80'
+        depends_on:
+            - mysql
+        environment:
+            - PHP_DISPLAY_ERRORS=1
+            - extension
+            - WEB_DOCUMENT_ROOT=/app/public
+            - XDEBUG_MODE=debug
+            - XDEBUG_DISCOVER_CLIENT_HOST=1
+            - XDEBUG_START_WITH_REQUEST=trigger
+            - XDEBUG_IDE_KEY=PHPSTORM
+    mysql:
+        image: 'mysql:8.3.0'
+        environment:
+            MYSQL_ROOT_PASSWORD: 'toor'
+            MYSQL_DATABASE: 'test'
+        volumes:
+            - './.docker/mysql:/var/lib/mysql'
+        ports:
+            - '3306:3306'
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        environment:
+            - discovery.type=single-node
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+        ports:
+            - "9200:9200"
